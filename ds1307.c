@@ -13,9 +13,7 @@ Please refer to LICENSE file for licensing information.
 #include "util/delay.h"
 
 #include "ds1307.h"
-
-//path to i2c fleury lib
-#include DS1307_I2CFLEURYPATH
+#include "i2cmaster.h"
 
 /*
  * days per month
@@ -23,7 +21,7 @@ Please refer to LICENSE file for licensing information.
 const uint8_t ds1307_daysinmonth [] PROGMEM = { 31,28,31,30,31,30,31,31,30,31,30,31 };
 
 /*
- * initialize the accellerometer
+ * initialize the ds1307
  */
 void ds1307_init() {
 	#if DS1307_I2CINIT == 1
@@ -71,18 +69,18 @@ uint8_t ds1307_getdayofweek(uint8_t y, uint8_t m, uint8_t d) {
  * set date
  */
 uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
-	//sanitize data
+	//check bounds
 	if (second < 0 || second > 59 ||
 		minute < 0 || minute > 59 ||
-		hour < 0 || hour > 23 ||
-		day < 1 || day > 31 ||
-		month < 1 || month > 12 ||
-		year < 0 || year > 99)
-		return 8;
+		hour < 0   || hour > 23   ||
+		day < 1    || day > 31    ||
+		month < 1  || month > 12  ||
+		year < 0   || year > 99)
+		return 2;
 
 	//sanitize day based on month
 	if(day > pgm_read_byte(ds1307_daysinmonth + month - 1))
-		return 0;
+		return 1;
 
 	//get day of week
 	uint8_t dayofweek = ds1307_getdayofweek(year, month, day);
@@ -97,6 +95,42 @@ uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, u
 	i2c_write(ds1307_dec2bcd(day));
 	i2c_write(ds1307_dec2bcd(month));
 	i2c_write(ds1307_dec2bcd(year));
+	i2c_write(0x00); //start oscillator
+	i2c_stop();
+
+	return 0;
+}
+
+/*
+ * set date
+ */
+uint8_t ds1307_setdate_s(time_t time) {
+	//check bounds
+	if (time.second < 0 || time.second > 59 ||
+	    time.minute < 0 || time.minute > 59 ||
+	    time.hour < 0   || time.hour > 23   ||
+	    time.day < 1    || time.day > 31    ||
+	    time.month < 1  || time.month > 12  ||
+	    time.year < 0   || time.year > 99)
+		return 2;
+
+	//sanitize day based on month
+	if(time.day > pgm_read_byte(ds1307_daysinmonth + time.month - 1))
+		return 1;
+
+	//get day of week
+	uint8_t dayofweek = ds1307_getdayofweek(time.year, time.month, time.day);
+
+	//write date
+	i2c_start_wait(DS1307_ADDR | I2C_WRITE);
+	i2c_write(0x00);//stop oscillator
+	i2c_write(ds1307_dec2bcd(time.second));
+	i2c_write(ds1307_dec2bcd(time.minute));
+	i2c_write(ds1307_dec2bcd(time.hour));
+	i2c_write(ds1307_dec2bcd(dayofweek));
+	i2c_write(ds1307_dec2bcd(time.day));
+	i2c_write(ds1307_dec2bcd(time.month));
+	i2c_write(ds1307_dec2bcd(time.year));
 	i2c_write(0x00); //start oscillator
 	i2c_stop();
 
@@ -122,4 +156,21 @@ void ds1307_getdate(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, 
 	i2c_stop();
 }
 
+/*
+ * get date
+ */
+void ds1307_getdate_s(time_t *time) {
+	i2c_start_wait(DS1307_ADDR | I2C_WRITE);
+	i2c_write(0x00);//stop oscillator
+	i2c_stop();
 
+	i2c_rep_start(DS1307_ADDR | I2C_READ);
+	time->second = ds1307_bcd2dec(i2c_readAck() & 0x7F);
+	time->minute = ds1307_bcd2dec(i2c_readAck());
+	time->hour = ds1307_bcd2dec(i2c_readAck());
+	i2c_readAck();
+	time->day = ds1307_bcd2dec(i2c_readAck());
+	time->month = ds1307_bcd2dec(i2c_readAck());
+	time->year = ds1307_bcd2dec(i2c_readNak());
+	i2c_stop();
+}
