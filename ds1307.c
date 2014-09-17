@@ -1,11 +1,12 @@
 /*
-ds1307 lib 0x01
-
-copyright (c) Davide Gironi, 2013
-
-Released under GPLv3.
-Please refer to LICENSE file for licensing information.
-*/
+ * ds1307 lib 0x01
+ * 
+ * copyright (c) Davide Gironi, 2013
+ * modified by CptSpaceToaster 09/16/2014
+ * 
+ * Released under GPLv3.
+ * Please refer to LICENSE file for licensing information.
+ */
 
 
 #include "avr/io.h"
@@ -87,7 +88,7 @@ uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, u
 
 	//write date
 	i2c_start_wait(DS1307_ADDR | I2C_WRITE);
-	i2c_write(0x00);//stop oscillator
+	i2c_write(0x00); //start writing data at memory address 0x00
 	i2c_write(ds1307_dec2bcd(second));
 	i2c_write(ds1307_dec2bcd(minute));
 	i2c_write(ds1307_dec2bcd(hour));
@@ -95,7 +96,7 @@ uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, u
 	i2c_write(ds1307_dec2bcd(day));
 	i2c_write(ds1307_dec2bcd(month));
 	i2c_write(ds1307_dec2bcd(year));
-	i2c_write(0x00); //start oscillator
+	i2c_write(0x00); //do nothing with the the external oscillator
 	i2c_stop();
 
 	return 0;
@@ -123,7 +124,7 @@ uint8_t ds1307_setdate_s(time_t time) {
 
 	//write date
 	i2c_start_wait(DS1307_ADDR | I2C_WRITE);
-	i2c_write(0x00);//stop oscillator
+	i2c_write(0x00); //start writing data at memory address 0x00
 	i2c_write(ds1307_dec2bcd(time.second));
 	i2c_write(ds1307_dec2bcd(time.minute));
 	i2c_write(ds1307_dec2bcd(time.hour));
@@ -131,7 +132,7 @@ uint8_t ds1307_setdate_s(time_t time) {
 	i2c_write(ds1307_dec2bcd(time.day));
 	i2c_write(ds1307_dec2bcd(time.month));
 	i2c_write(ds1307_dec2bcd(time.year));
-	i2c_write(0x00); //start oscillator
+	i2c_write(0x00); //do nothing with the the external oscillator
 	i2c_stop();
 
 	return 1;
@@ -142,7 +143,7 @@ uint8_t ds1307_setdate_s(time_t time) {
  */
 void ds1307_getdate(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
 	i2c_start_wait(DS1307_ADDR | I2C_WRITE);
-	i2c_write(0x00);//stop oscillator
+	i2c_write(0x00); //start reading data at memory address 0x00???  This may not be necessary
 	i2c_stop();
 
 	i2c_rep_start(DS1307_ADDR | I2C_READ);
@@ -161,7 +162,7 @@ void ds1307_getdate(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, 
  */
 void ds1307_getdate_s(time_t *time) {
 	i2c_start_wait(DS1307_ADDR | I2C_WRITE);
-	i2c_write(0x00);//stop oscillator
+	i2c_write(0x00); //start reading data at memory address 0x00???  This may not be necessary
 	i2c_stop();
 
 	i2c_rep_start(DS1307_ADDR | I2C_READ);

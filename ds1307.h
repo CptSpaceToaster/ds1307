@@ -1,14 +1,14 @@
 /*
-ds1307 lib 0x01
-
-copyright (c) Davide Gironi, 2013
-modified by CptSpaceToaster 09/16/2014
-
-Released under GPLv3.
-Please refer to LICENSE file for licensing information.
-
-References: parts of the code taken from https://github.com/adafruit/RTClib
-*/
+ * ds1307 lib 0x01
+ * 
+ * copyright (c) Davide Gironi, 2013
+ * modified by CptSpaceToaster 09/16/2014
+ * 
+ * Released under GPLv3.
+ * Please refer to LICENSE file for licensing information.
+ * 
+ * References: parts of the code taken from https://github.com/adafruit/RTClib
+ */
 
 #ifndef DS1307_H
 #define DS1307_H
