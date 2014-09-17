@@ -26,8 +26,6 @@ typedef struct time {
 //definitions
 #define DS1307_ADDR (0x68<<1) //device address
 
-//path to i2c fleury lib
-#define DS1307_I2CFLEURYPATH "../i2chw/i2cmaster.h" //define the path to i2c fleury lib
 #define DS1307_I2CINIT 1 //init i2c
 
 //functions
