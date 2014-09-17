@@ -24,7 +24,7 @@ typedef struct time {
 } time_t;
 
 //definitions
-#define DS1307_ADDR (0x68<<1) //device address
+#define DS1307_ADDR (0x68<<1) //device address shifted over one
 
 //functions
 extern void ds1307_init();
