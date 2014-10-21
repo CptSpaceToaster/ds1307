@@ -102,7 +102,7 @@ uint8_t ds1307_setdate_s(time_t time) {
 	    time.month < 1  || time.month > 12  ||
 	    time.year < 0   || time.year > 99)
 		return 2;
-
+	
 	//sanitize day based on month
 	if(time.day > pgm_read_byte(ds1307_daysinmonth + time.month - 1))
 		return 1;
