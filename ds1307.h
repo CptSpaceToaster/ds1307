@@ -27,11 +27,10 @@ typedef struct time {
 #define DS1307_ADDR (0x68<<1) //device address shifted over one
 
 //functions
-extern void ds1307_init();
-extern uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
-extern uint8_t ds1307_setdate_s(time_t time);
-extern void ds1307_getdate(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second);
-extern void ds1307_getdate_s(time_t *time);
+uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
+uint8_t ds1307_setdate_s(time_t time);
+void ds1307_getdate(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second);
+void ds1307_getdate_s(time_t *time);
 
 #endif
 

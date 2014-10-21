@@ -8,13 +8,12 @@
  * Please refer to LICENSE file for licensing information.
  */
 
-
 #include "avr/io.h"
 #include "avr/pgmspace.h"
 #include "util/delay.h"
 
 #include "ds1307.h"
-#include "i2cmaster.h"
+#include "../twi/i2cmaster.h"
 
 /*
  * days per month
