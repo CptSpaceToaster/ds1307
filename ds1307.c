@@ -7,7 +7,6 @@
  * Released under GPLv3.
  * Please refer to LICENSE file for licensing information.
  */
-
 #include "avr/io.h"
 #include "avr/pgmspace.h"
 #include "util/delay.h"
@@ -55,6 +54,21 @@ uint8_t ds1307_getdayofweek(uint8_t y, uint8_t m, uint8_t d) {
 }
 
 /*
+ * returns true if the given year (two digit suffix) is a leap year
+ */
+bool ds1307_isleapyear(uint16_t year) {
+	if (year % 400 == 0) {
+		return true;
+	} else if (year % 100 == 0) {
+		return false;
+	} else if (year % 4 == 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/*
  * set date
  */
 uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
@@ -68,7 +82,7 @@ uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, u
 		return 2;
 
 	//sanitize day based on month
-	if(day > pgm_read_byte(ds1307_daysinmonth + month - 1))
+	if(day > pgm_read_byte(ds1307_daysinmonth + month - 1)  + (month == 2 && ds1307_isleapyear(year)))
 		return 1;
 
 	//get day of week
@@ -104,7 +118,7 @@ uint8_t ds1307_setdate_s(time_t time) {
 		return 2;
 
 	//sanitize day based on month
-	if(time.day > pgm_read_byte(ds1307_daysinmonth + time.month - 1))
+	if(time.day > pgm_read_byte(ds1307_daysinmonth + time.month - 1) + (time.month == 2 && ds1307_isleapyear(time.year)))
 		return 1;
 
 	//get day of week
@@ -131,7 +145,7 @@ uint8_t ds1307_setdate_s(time_t time) {
  */
 void ds1307_getdate(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second) {
 	i2c_start_wait(DS1307_ADDR | I2C_WRITE);
-	i2c_write(0x00); //start reading data at memory address 0x00???  This may not be necessary
+	i2c_write(0x00);
 	i2c_stop();
 
 	i2c_rep_start(DS1307_ADDR | I2C_READ);
@@ -149,10 +163,9 @@ void ds1307_getdate(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, 
  * get date
  */
 void ds1307_getdate_s(time_t *time) {
-	i2c_start_wait(DS1307_ADDR | I2C_WRITE);
-	i2c_write(0x00); //start reading data at memory address 0x00???  This may not be necessary
+	i2c_start(DS1307_ADDR | I2C_WRITE);
+	i2c_write(0x00);
 	i2c_stop();
-
 	i2c_rep_start(DS1307_ADDR | I2C_READ);
 	time->second = ds1307_bcd2dec(i2c_readAck() & 0x7F);
 	time->minute = ds1307_bcd2dec(i2c_readAck());
