@@ -56,7 +56,7 @@ uint8_t ds1307_getdayofweek(uint8_t y, uint8_t m, uint8_t d) {
 /*
  * returns true if the given year (two digit suffix) is a leap year
  */
-bool ds1307_isleapyear(uint16_t year) {
+bool ds1307_isleapyear(uint8_t year) {
 	if (year % 400 == 0) {
 		return true;
 	} else if (year % 100 == 0) {

@@ -32,7 +32,7 @@ typedef struct clock {
 uint8_t ds1307_setdate(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
 uint8_t ds1307_setdate_s(time_t time);
 uint8_t ds1307_getdayofweek(uint8_t y, uint8_t m, uint8_t d);
-bool ds1307_isleapyear(uint16_t year);
+bool ds1307_isleapyear(uint8_t year);
 void ds1307_getdate(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *second);
 void ds1307_getdate_s(time_t *time);
 
